@@ -1,0 +1,66 @@
+name: 'Digital Ocean k8s deploy'
+description: 'Deploy some yaml to k8s-do using Digital Ocean tools'
+inputs:
+  tag-name:
+    description: 'Docker image tag name'
+    required: true
+    default: 'staging'
+  yaml-file:
+    description: 'YAML file path'
+    required: true
+    default: 'path-here'
+  app-name:
+    description: 'App name'
+    required: true
+    default: 'no-app-name'
+  namespace:
+    description: 'Namespace'
+    required: true
+    default: 'no-namespace'  
+  do-token:
+    description: 'Digital Ocean Access Token'
+    required: true
+    default: 'default'
+  cluster-name:
+    description: 'Kubernetes cluster name'
+    required: true
+    default: 'none'  
+runs:
+  using: "composite"
+  steps:
+    - run: echo Hello ${{ inputs.tag-name }}.
+      shell: bash
+
+    - name: Get action number
+      shell: bash
+      id: get_action_number
+      run: echo ::set-output name=NUMBER::$(echo $GITHUB_REF | cut -d / -f 3)$(echo "-$GITHUB_RUN_NUMBER")
+
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ inputs.do-token }}
+
+    - name: Update deployment file
+      shell: bash
+      run: |
+        sed -i 's|<ID>|'${{ inputs.tag-name }}'|' $GITHUB_WORKSPACE${{ inputs.yaml-file }}
+        sed -i 's|<ACTION-ID>|'${{ steps.get_action_number.outputs.NUMBER }}'|' $GITHUB_WORKSPACE${{ inputs.yaml-file }}
+
+    - name: Save DigitalOcean kubeconfig with short-lived credentials
+      shell: bash
+      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ inputs.cluster-name }}
+
+    - name: Deploy to DigitalOcean Kubernetes
+      shell: bash
+      run: kubectl apply -f $GITHUB_WORKSPACE${{ inputs.yaml-file }}
+
+    - name: Rollout deploy
+      if: inputs.tag-name == 'staging'
+      shell: bash
+      run: kubectl rollout restart -n ${{ inputs.namespace }} deployment ${{ inputs.app-name }} 
+
+    - name: Verify deployment
+      shell: bash
+      run: kubectl rollout status deployment/${{ inputs.app-name }} -n ${{ inputs.namespace }}
+
