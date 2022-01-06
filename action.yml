@@ -25,6 +25,10 @@ inputs:
     description: 'Kubernetes cluster name'
     required: true
     default: 'none'  
+  type:
+    description: 'Type of application, deployment, statefulset'
+    required: false
+    default: 'deployment'  
 runs:
   using: "composite"
   steps:
@@ -58,9 +62,8 @@ runs:
     - name: Rollout deploy
       if: inputs.tag-name == 'staging'
       shell: bash
-      run: kubectl rollout restart -n ${{ inputs.namespace }} deployment ${{ inputs.app-name }} 
+      run: kubectl rollout restart -n ${{ inputs.namespace }} ${{ inputs.type }} ${{ inputs.app-name }} 
 
     - name: Verify deployment
       shell: bash
-      run: kubectl rollout status deployment/${{ inputs.app-name }} -n ${{ inputs.namespace }}
-
+      run: kubectl rollout status ${{ inputs.type }}/${{ inputs.app-name }} -n ${{ inputs.namespace }}
