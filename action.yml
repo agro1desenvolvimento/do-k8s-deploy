@@ -32,7 +32,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: echo Hello ${{ inputs.tag-name }}.
+    - run: echo Inputs tag-name:${{ inputs.tag-name }}, yaml-file:${{ inputs.tag-name }}, app-name:${{ inputs.tag-name }}, namespace:${{ inputs.tag-name }}, do-token:${{ inputs.tag-name }}, cluster-name:${{ inputs.tag-name }}, type:${{ inputs.tag-name }},
       shell: bash
 
     - name: Get action number
