@@ -1,6 +1,6 @@
 # do-k8s-deploy
 
-Action to apply a deployment to a Kubernetes cluster.
+Action to apply a deployment to a Digital Ocean Kubernetes cluster.
 
 ## k8s yaml example - '/iac/deployment.yaml'
 ```
@@ -50,7 +50,7 @@ jobs:
         ...
       - name: Deploy HML
         id: deploy_hml
-        uses: madalozzo/do-k8s-deploy@v2
+        uses: agro1inovacao/do-k8s-deploy@v3
         with:
           tag-name: 'staging' # the tag-name of image, can be created dinamically too
           do-token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} # create a secret with your token
@@ -58,4 +58,5 @@ jobs:
           yaml-file: '/iac/deployment.yaml'
           app-name: 'app-name'
           namespace: 'namespace-name'
+          type: 'deployment'
 ```
