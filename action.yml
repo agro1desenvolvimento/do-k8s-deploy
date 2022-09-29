@@ -33,10 +33,14 @@ inputs:
     description: 'Activate debug funcions'
     required: false
     default: 'false'  
+  doctl-version:
+    description: 'doctl version'
+    required: false
+    default: ''  
 runs:
   using: "composite"
   steps:
-    - run: echo Inputs tag-name:${{ inputs.tag-name }}, yaml-file:${{ inputs.yaml-file }}, app-name:${{ inputs.app-name}}, namespace:${{ inputs.namespace }}, do-token:${{ inputs.do-token}}, cluster-name:${{ inputs.cluster-name }}, type:${{ inputs.type }},
+    - run: echo Inputs tag-name:${{ inputs.tag-name }}, yaml-file:${{ inputs.yaml-file }}, app-name:${{ inputs.app-name}}, namespace:${{ inputs.namespace }}, do-token:${{ inputs.do-token}}, cluster-name:${{ inputs.cluster-name }}, type:${{ inputs.type }}, debug:${{ inputs.debug }}, doctl-version:${{ inputs.doctl-version }},
       shell: bash
 
     - name: Get action number
@@ -45,9 +49,11 @@ runs:
       run: echo ::set-output name=NUMBER::$(echo $GITHUB_REF | cut -d / -f 3)$(echo "-$GITHUB_RUN_NUMBER")
 
     - name: Install doctl
+      if: inputs.install-doctl == 'true'
       uses: digitalocean/action-doctl@v2
       with:
         token: ${{ inputs.do-token }}
+        version : ${{ inputs.doctl-version }}
 
     - name: DOCTL version
       if: inputs.debug == 'true'
