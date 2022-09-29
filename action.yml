@@ -49,7 +49,6 @@ runs:
       run: echo ::set-output name=NUMBER::$(echo $GITHUB_REF | cut -d / -f 3)$(echo "-$GITHUB_RUN_NUMBER")
 
     - name: Install doctl
-      if: inputs.install-doctl == 'true'
       uses: digitalocean/action-doctl@v2
       with:
         token: ${{ inputs.do-token }}
