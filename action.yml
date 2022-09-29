@@ -28,7 +28,11 @@ inputs:
   type:
     description: 'Type of application, deployment, statefulset'
     required: false
-    default: 'deployment'  
+    default: 'deployment' 
+  debug:
+    description: 'Activate debug funcions'
+    required: false
+    default: 'false'  
 runs:
   using: "composite"
   steps:
@@ -45,15 +49,33 @@ runs:
       with:
         token: ${{ inputs.do-token }}
 
+    - name: DOCTL version
+      if: inputs.debug == 'true'
+      shell: bash
+      run: |
+        doctl version
+
     - name: Update deployment file
       shell: bash
       run: |
         sed -i 's|<ID>|'${{ inputs.tag-name }}'|' $GITHUB_WORKSPACE${{ inputs.yaml-file }}
         sed -i 's|<ACTION-ID>|'${{ steps.get_action_number.outputs.NUMBER }}'|' $GITHUB_WORKSPACE${{ inputs.yaml-file }}
 
+    - name: Cat yaml
+      if: inputs.debug == 'true'
+      shell: bash
+      run: |
+        cat $GITHUB_WORKSPACE${{ inputs.yaml-file }}
+
     - name: Save DigitalOcean kubeconfig with short-lived credentials
       shell: bash
       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ inputs.cluster-name }}
+
+    - name: kubectl get contexts
+      if: inputs.debug == 'true'
+      shell: bash
+      run: |
+        kubectl config get-contexts
 
     - name: Deploy to DigitalOcean Kubernetes
       shell: bash
