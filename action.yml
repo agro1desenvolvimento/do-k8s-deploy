@@ -46,7 +46,7 @@ runs:
     - name: Get action number
       shell: bash
       id: get_action_number
-      run: echo ::set-output name=NUMBER::$(echo $GITHUB_REF | cut -d / -f 3)$(echo "-$GITHUB_RUN_NUMBER")
+      run: echo "NUMBER=$(echo $GITHUB_REF | cut -d / -f 3)$(echo "-$GITHUB_RUN_NUMBER")" >> $GITHUB_OUTPUT
 
     - name: Install doctl
       uses: digitalocean/action-doctl@v2
