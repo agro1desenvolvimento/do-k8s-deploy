@@ -50,7 +50,7 @@ jobs:
         ...
       - name: Deploy HML
         id: deploy_hml
-        uses: agro1inovacao/do-k8s-deploy@v3
+        uses: agro1inovacao/do-k8s-deploy@v6
         with:
           tag-name: 'staging' # the tag-name of image, can be created dinamically too
           do-token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} # create a secret with your token
